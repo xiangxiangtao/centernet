@@ -8,6 +8,10 @@ import numpy as np
 from progress.bar import Bar
 import torch
 
+import sys
+this_dir = os.path.dirname(__file__)
+sys.path.insert(0, os.path.join(this_dir, '..'))
+
 from src.lib.opts import opts
 # from src.lib.logger import Logger
 from src.lib.utils.utils import AverageMeter
@@ -16,6 +20,8 @@ from src.lib.detectors.detector_factory import detector_factory
 from src.tools.voc_eval_lib.datasets.pascal_voc import dataset_name
 from src.tools.voc_eval_lib.model.config import cfg
 import time
+
+
 
 class Timer(object):
   """A simple timer."""
@@ -164,7 +170,7 @@ def eval_one_weight():
 
   opt = opts().parse()
   # print(opt.heads)
-  opt.load_model='../models/weight_centernet_gas_composite18_1_epoch_15.pth'####################
+  opt.load_model='models/weight_centernet_gas_composite18_1_epoch_15.pth'####################
   if opt.not_prefetch_test:
     eval(opt,eval_split)
   else:

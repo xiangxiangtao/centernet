@@ -52,7 +52,7 @@ class Smoke(data.Dataset):
         self.split = split
         self.opt = opt
 
-        print('==> initializing steel {} data.'.format(split))
+        print('==> initializing smoke {} data.'.format(split))
         self.coco = coco.COCO(self.annot_path)
         self.images = self.coco.getImgIds()
         self.num_samples = len(self.images)

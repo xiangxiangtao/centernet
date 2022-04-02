@@ -2,12 +2,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import src._init_paths
-
 import os
+import sys
+this_dir = os.path.dirname(__file__)
+sys.path.insert(0, os.path.join(this_dir, '..'))
+
+import src._init_paths
 
 import torch
 import torch.utils.data
+
+
 from src.lib.opts import opts
 from src.lib.models.model import create_model, load_model, save_model
 from src.lib.models.data_parallel import DataParallel

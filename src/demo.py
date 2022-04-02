@@ -2,9 +2,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
+import sys
+this_dir = os.path.dirname(__file__)
+sys.path.insert(0, os.path.join(this_dir, '..'))
+
 import src._init_paths
 
-import os
 import cv2
 
 from src.lib.opts import opts
@@ -18,6 +22,7 @@ def demo(opt):
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
   opt.debug = max(opt.debug, 1)
   Detector = detector_factory[opt.task]
+  print("opt={}".format(opt))
   detector = Detector(opt)
 
   if opt.demo == 'webcam' or \
@@ -26,14 +31,14 @@ def demo(opt):
     detector.pause = False
     while True:
         _, img = cam.read()
-        cv2.imshow('input', img)
+        # cv2.imshow('input', img)
         ret = detector.run(img)
         time_str = ''
         for stat in time_stats:
           time_str = time_str + '{} {:.3f}s |'.format(stat, ret[stat])
-        print(time_str)
-        if cv2.waitKey(1) == 27:
-            return  # esc to quit
+        # print(time_str)
+        # if cv2.waitKey(1) == 27:
+        #     return  # esc to quit
   else:
     if os.path.isdir(opt.demo):
       image_names = []
@@ -45,7 +50,10 @@ def demo(opt):
     else:
       image_names = [opt.demo]
     
+    print("***len image_names={}".format(len(image_names)))
     for (image_name) in image_names:
+      print("-"*50)
+      print(image_name)
       ret = detector.run(image_name)
       time_str = ''
       for stat in time_stats:
@@ -53,4 +61,8 @@ def demo(opt):
       print(time_str)
 if __name__ == '__main__':
   opt = opts().init()
+
+  print("-"*20)
+  print(opt.demo)
+
   demo(opt)

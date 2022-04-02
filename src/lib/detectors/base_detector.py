@@ -11,7 +11,7 @@ import torch
 from src.lib.models.model import create_model, load_model
 from src.lib.utils.image import get_affine_transform
 from src.lib.utils.debugger import Debugger
-
+import os
 
 class BaseDetector(object):
   def __init__(self, opt):
@@ -32,7 +32,8 @@ class BaseDetector(object):
     self.num_classes = opt.num_classes
     self.scales = opt.test_scales
     self.opt = opt
-    self.pause = True
+    self.pause = False
+
 
   def pre_process(self, image, scale, meta=None):
     height, width = image.shape[0:2]
@@ -97,7 +98,7 @@ class BaseDetector(object):
     
     loaded_time = time.time()
     load_time += (loaded_time - start_time)
-    
+
     detections = []
     for scale in self.scales:
       scale_start_time = time.time()
@@ -129,7 +130,7 @@ class BaseDetector(object):
       post_time += post_process_time - decode_time
 
       detections.append(dets)
-    
+
     results = self.merge_outputs(detections)
     torch.cuda.synchronize()
     end_time = time.time()
@@ -137,8 +138,9 @@ class BaseDetector(object):
     tot_time += end_time - start_time
 
     if self.opt.debug >= 1:
-      self.show_results(debugger, image, results)
-    
+      image_name = os.path.split(image_or_path_or_tensor)[-1]
+      self.show_results(debugger, image, results, image_name)
+
     return {'results': results, 'tot': tot_time, 'load': load_time,
             'pre': pre_time, 'net': net_time, 'dec': dec_time,
             'post': post_time, 'merge': merge_time}

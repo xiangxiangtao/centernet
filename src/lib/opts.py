@@ -22,10 +22,10 @@ class opts(object):
                                   '2: show the network output features'
                                   '3: use matplot to display' # useful when lunching training with ipython notebook
                                   '4: save all visualizations to disk')
-    self.parser.add_argument('--demo', default='../data/IR/valid/image',################################################
+    self.parser.add_argument('--demo', default='../data/real_7_gmy/val/image',################################################
                              help='path to image/ image folders/ video. '
                                   'or "webcam"')
-    self.parser.add_argument('--load_model', default='', #../exp/ctdet/dla34-mod/model_best.pth
+    self.parser.add_argument('--load_model', default='../models/weight_centernet_gas_composite18_1_epoch_15.pth', #../exp/ctdet/dla34-mod/model_best.pth
                              help='path to pretrained model')  #../exp/ctdet/dla34/model_best.pth
     self.parser.add_argument('--resume', action='store_true',
                              help='resume an experiment. '
@@ -340,9 +340,15 @@ class opts(object):
       # 'ctdet': {'default_resolution': [320, 320], 'num_classes': 80,
       #           'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
       #           'dataset': 'coco'},
-      'ctdet': {'default_resolution': [320, 320], 'num_classes': 6,
+      # 'ctdet': {'default_resolution': [320, 320], 'num_classes': 6,
+      #           'mean': [0.503, 0.503, 0.503], 'std': [0.105, 0.105, 0.105],
+                # 'dataset': 'steel'},
+
+      'ctdet': {'default_resolution': [320, 320], 'num_classes': 1,
                 'mean': [0.503, 0.503, 0.503], 'std': [0.105, 0.105, 0.105],
-                'dataset': 'steel'},
+                'dataset': 'gas'},
+
+
       'exdet': {'default_resolution': [512, 512], 'num_classes': 80, 
                 'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
                 'dataset': 'coco'},
@@ -363,6 +369,5 @@ class opts(object):
     opt = self.parse(args)
     dataset = Struct(default_dataset_info[opt.task])
     opt.dataset = dataset.dataset
-    print('*'*50)
     opt = self.update_dataset_info_and_set_heads(opt, dataset)
     return opt

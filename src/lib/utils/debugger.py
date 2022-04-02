@@ -2,6 +2,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os.path
+
 import numpy as np
 import cv2
 from .ddd_utils import compute_box_3d, project_to_image, draw_box_3d
@@ -23,6 +25,7 @@ class Debugger(object):
       self.colors = self.colors.reshape(-1)[::-1].reshape(len(colors), 1, 1, 3)
       self.colors = np.clip(self.colors, 0., 0.6 * 255).astype(np.uint8)
     self.dim_scale = 1
+
     if dataset == 'coco_hp':
       self.names = ['p']
       self.num_class = 1
@@ -50,6 +53,7 @@ class Debugger(object):
     #     self.names = smoke_class_name
     elif num_classes == 1 or dataset == 'gas':
         self.names = myclass
+        # print("self.names={}".format(self.names))
 
     elif dataset == 'gta':
       self.names = gta_class_name
@@ -182,17 +186,24 @@ class Debugger(object):
     c = self.colors[cat][0][0].tolist()
     if self.theme == 'white':
       c = (255 - np.array(c)).tolist()
-    txt = '{}{:.1f}'.format(self.names[cat], conf)
+    
+    c = (0, 255, 255)
+    if self.names == "smoke":
+      txt = '{}: {:.1f}'.format("gas", conf)
+      c = (0, 255, 255)
+    else:
+      txt = '{}{:.1f}'.format(self.names[cat], conf)
+
     font = cv2.FONT_HERSHEY_SIMPLEX
     cat_size = cv2.getTextSize(txt, font, 0.5, 2)[0]
     cv2.rectangle(
-      self.imgs[img_id], (bbox[0], bbox[1]), (bbox[2], bbox[3]), c, 2)
+      self.imgs[img_id], (bbox[0], bbox[1]), (bbox[2], bbox[3]), c, 1)
     if show_txt:
-      cv2.rectangle(self.imgs[img_id],
-                    (bbox[0], bbox[1] - cat_size[1] - 2),
-                    (bbox[0] + cat_size[0], bbox[1] - 2), c, -1)
-      cv2.putText(self.imgs[img_id], txt, (bbox[0], bbox[1] - 2), 
-                  font, 0.5, (0, 0, 0), thickness=1, lineType=cv2.LINE_AA)
+      # cv2.rectangle(self.imgs[img_id],
+      #               (bbox[0], bbox[1] + 1),
+      #               (bbox[0] + cat_size[0], bbox[1] +cat_size[1] + 1), c, -1)
+      cv2.putText(self.imgs[img_id], txt, (bbox[0], bbox[1] + cat_size[1]+ 2), 
+                  font, 0.5, c, thickness=1, lineType=cv2.LINE_AA)
 
   def add_coco_hp(self, points, img_id='default'): 
     points = np.array(points, dtype=np.int32).reshape(self.num_joints, 2)
@@ -242,7 +253,7 @@ class Debugger(object):
   def save_img(self, imgId='default', path='./cache/debug/'):
     cv2.imwrite(path + '{}.png'.format(imgId), self.imgs[imgId])
     
-  def save_all_imgs(self, path='./cache/debug/', prefix='', genID=False):
+  def save_all_imgs(self, path='./cache/debug/', prefix='', genID=False,image_name=None):
     if genID:
       try:
         idx = int(np.loadtxt(path + '/id.txt'))
@@ -251,7 +262,12 @@ class Debugger(object):
       prefix=idx
       np.savetxt(path + '/id.txt', np.ones(1) * (idx + 1), fmt='%d')
     for i, v in self.imgs.items():
-      cv2.imwrite(path + '/{}{}.png'.format(prefix, i), v)
+      if image_name is None:
+        image_path = path + '/{}{}.png'.format(prefix, i)
+      else:
+        image_path = os.path.join(path,image_name)
+      print(image_path)
+      cv2.imwrite(image_path, v)
 
   def remove_side(self, img_id, img):
     if not (img_id in self.imgs):
