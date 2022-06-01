@@ -95,7 +95,7 @@ class CtdetDetector(BaseDetector):
         if bbox[4] > self.opt.vis_thresh:
           debugger.add_coco_bbox(bbox[:4], j - 1, bbox[4], img_id='ctdet')
     # debugger.show_all_imgs(pause=self.pause)
-    detect_path = "detection/det_retinanet_thresh{}".format(self.opt.vis_thresh)
+    detect_path = "detection/det_centernet_thresh{}".format(self.opt.vis_thresh)
     if not os.path.exists(detect_path):
       os.makedirs(detect_path)
     # print(os.path.abspath(detect_path))
